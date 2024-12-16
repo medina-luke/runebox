@@ -9,10 +9,14 @@ interface RuneStore {
         passive: number;
         click: number;
     },
+    progress: {
+        threshold: number;
+    }
     actions: {
         addToRunes: (v?: number) => void,
         setRunesTo: (v: number) => void,
-        addToIncome: (type: IncomeType, v: number) => void
+        addToIncome: (type: IncomeType, v: number) => void,
+        setThreshold: (v: number) => void
     }
 }
 
@@ -22,9 +26,19 @@ export const useRuneStore = create(devtools<RuneStore>(set => ({
         passive: 1,
         click: 1,
     },
+    progress: {
+        threshold: 0,
+    },
     actions: {
         addToRunes: (value?: number) => set(state => ({ runes: state.runes + (value || state.income.passive) }), false, "stats/addToRunes"),
         setRunesTo: (value: number) => set(() => ({ runes: value }), false, "stats/setRunesTo"),
-        addToIncome: (type: IncomeType, value: number) => set(state => ({ [state.income[type]]: value }), false, "stats/addToIncome")
+        addToIncome: (type: IncomeType, value: number) => set(state => ({ [state.income[type]]: value }), false, "stats/addToIncome"),
+        setThreshold: (value: number) => {
+            set(state => ({ 
+                progress: {
+                    threshold: value > state.progress.threshold ? value : state.progress.threshold 
+                }
+            }), false, "progress/setThreshold")
+        }
     }
 })));
