@@ -1,31 +1,30 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
+import { useRuneStore } from "../../store/rune";
 
 export const useRunes = () => {
-    const [income, setIncome] = useState<number>(1);
-    const [runes, setRunes] = useState<number>(0);
+    const { addToIncome, addToRunes, setRunesTo } = useRuneStore(state => state.actions);
+    const runes = useRuneStore(state => state.runes);
+    const income = useRuneStore(state => state.income);
 
-    const addToRunes = useCallback((value?: number) => {
-        setRunes((prevState) => prevState + (value || income));
-    }, [income]);
-
-    const setRunesTo = (value: number) => {
-        setRunes(value);
-    }
+    const addValueToRunes = useCallback((value?: number) => {
+        addToRunes(value)
+    }, [addToRunes]);
 
     useEffect(() => {
         const incomeFlow = setInterval(() => {
-            addToRunes();
+            addValueToRunes();
         }, 1000);
 
         return () => {
             clearInterval(incomeFlow);
         }
-    }, [addToRunes]);
+    }, [addValueToRunes]);
 
     return {
-        runes,
+        ...useMemo(() => ({ runes, income}), [runes, income]),
+        addValueToRunes,
         setRunesTo,
         addToRunes,
-        setIncome
-    }
+        addToIncome
+    };
 }
