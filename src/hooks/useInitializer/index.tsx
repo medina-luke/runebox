@@ -1,57 +1,50 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useRunes } from "../useRunes";
 
 export const useInitializer = () => {
     const incomeFlow = useRef<number>(0);
-    const [timeDiff, setTimeDiff] = useState<number>(new Date().getTime());
+    const timeDiff = useRef<number>(new Date().getTime());
     const { addValueToRunes, income } = useRunes();
 
-    const startIncomeFlow = useCallback(() => {
-        console.log("on");
+    const startIncomeFlow = () => {
         incomeFlow.current = setInterval(() => {
             addValueToRunes();
         }, 1000);
-    }, [addValueToRunes]);
+    };
 
-    const stopIncomeFlow = useCallback(() => {
-        console.log("off");
+    const stopIncomeFlow = () => {
         clearInterval(incomeFlow.current);
-    }, []);
+    };
 
-    const adjustByTimeInflation = useCallback(() => {
+    const adjustByTimeInflation = () => {
         const currentTime = new Date().getTime();
-        const timeDiffTicks = Math.round((currentTime - timeDiff) / 1000);
-        
-        const dueRunes = timeDiffTicks * income.passive;
-        console.log({ dueRunes, timeDiffTicks, currentTime, timeDiff });
-        addValueToRunes(dueRunes);
-    }, [addValueToRunes, income.passive])
+        const timeDiffTicks = Math.round((currentTime - timeDiff.current) / 1000);
 
-    const handleVisibilityChange = useCallback((event: Event) => {
-        console.log("visibility change")
+        const dueRunes = timeDiffTicks * income.passive;
+        addValueToRunes(dueRunes);
+    }
+
+    const handleVisibilityChange = useCallback(() => {
         const isVisible = document.visibilityState === "visible";
         if (!isVisible) {
-            console.log("page is hidden, time has stopped");
+            timeDiff.current = new Date().getTime();
             stopIncomeFlow();
-            setTimeDiff(new Date().getTime());
         } else {
-            console.log("page is back");
             adjustByTimeInflation();
             startIncomeFlow();
         }
-    }, [adjustByTimeInflation, startIncomeFlow, stopIncomeFlow]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Consistent passive income flow
     useEffect(() => {
-        console.log("useEffect mount");
         startIncomeFlow();
 
         window.addEventListener("visibilitychange", handleVisibilityChange);
         return () => {
-            console.log("useEffect unmount");
             stopIncomeFlow();
             window.removeEventListener("visibilitychange", handleVisibilityChange);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 }
