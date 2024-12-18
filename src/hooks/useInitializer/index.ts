@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useRunes } from "../useRunes";
+import useCycle from "../useCycle";
 
 export const useInitializer = () => {
     const incomeFlow = useRef<number>(0);
     const timeDiff = useRef<number>(new Date().getTime());
     const { addValueToRunes, income } = useRunes();
+    const { incrementLifespan } = useCycle();
 
     const startIncomeFlow = () => {
         incomeFlow.current = setInterval(() => {
             addValueToRunes();
+            incrementLifespan();
         }, 1000);
     };
 
@@ -22,6 +25,7 @@ export const useInitializer = () => {
 
         const dueRunes = timeDiffTicks * income.passive;
         addValueToRunes(dueRunes);
+        incrementLifespan(dueRunes);
     }
 
     const handleVisibilityChange = useCallback(() => {

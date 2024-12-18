@@ -1,8 +1,8 @@
 import { ThemeProvider } from 'styled-components'
 import './App.css'
-import Room from './components/Room'
 import { appTheme, GlobalStyles } from './theme/theme'
 import { useInitializer } from './hooks/useInitializer'
+import StoryContainer from './components/StoryContainer'
 
 function App() {
   useInitializer();
@@ -10,7 +10,7 @@ function App() {
   return (
     <ThemeProvider theme={appTheme}>
       <GlobalStyles />
-      <Room />
+      <StoryContainer />
     </ThemeProvider>
   )
 }
