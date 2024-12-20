@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useProgression } from '../../../../hooks/useProgression'
 
 import * as Styles from "./styles"
+import { CommonButtonContainer } from '../../../common/ButtonContainer/styles';
 
 type Chapter0State = "start" | "look-around" | "close-to-door" | "do-nothing" | "end";
 
@@ -13,8 +14,37 @@ export default function Chapter0() {
     const [IsPostLightScreen, setIsPostLightScreen] = useState<boolean>(false);
 
     useEffect(() => {
+        console.log("useeffect")
         setDialogue(0);
-    }, [chapterState, setDialogue])
+        switch (chapterState) {
+            case "start":
+                return advanceDialogueUntil(5, 2500);
+            case "look-around":
+                advanceDialogueUntil(9, 1500);
+                setHasCheckedTheRoom(true);
+                break;
+            case "do-nothing":
+                advanceDialogueUntil(9, 2500);
+                break;
+            case "close-to-door":
+                advanceDialogueUntil(6, 2000);
+                break;
+            case "end":
+                advanceDialogueUntil(9, 2000, () => {
+                    setHasReachedEnd(true);
+                    advanceDialogueUntil(15, 3000, () => {
+                        setIsPostLightScreen(true);
+                        setTimeout(() => {
+                            nextChapter();
+                        }, 5000);
+                    });
+                });
+                break;
+            default:
+                break;
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [chapterState])
 
     const handleLookAround = () => {
         setChapterState("look-around")
@@ -33,7 +63,6 @@ export default function Chapter0() {
     }
 
     const renderIntro = () => {
-        advanceDialogueUntil(4, 2500);
         return <>
             <p>
                 You wake up in an empty, but somewhat familiar room.<br />
@@ -44,20 +73,19 @@ export default function Chapter0() {
                     You see a door on the very opposide side, across the room.<br />
                 </>}
                 {dialogueStep > 3 && <>
-                    The door seems to have been sealed shut. From a closer distance, maybe you could check it out.
+                    The door seems to have been sealed shut. From a closer distance, maybe you could check it out...
                 </>}
             </p>
-            {dialogueStep > 4 && <>
-                <button onClick={handleApproachDoor}>Approach the sealed door</button>
-                <button onClick={handleLookAround}>Look around</button>
-            </>}
+            {dialogueStep > 4 &&
+                <CommonButtonContainer>
+                    <button onClick={handleApproachDoor}>Approach the sealed door</button>
+                    <button onClick={handleLookAround}>Look around</button>
+                </CommonButtonContainer>
+            }
         </>
     }
 
     const renderLookAround = () => {
-        advanceDialogueUntil(8, 1500);
-        setHasCheckedTheRoom(true);
-
         return <>
             <p>.{dialogueStep > 0 && "."}{dialogueStep > 1 && "."}</p>
             <p>{dialogueStep > 2 && "Huh."}</p>
@@ -78,32 +106,34 @@ export default function Chapter0() {
             </p>}
             {dialogueStep > 8 && <>
                 <p>You can't help but notice a keen attention to detail, from whoever was responsible for organizing all the chairs.</p>
-                <button onClick={handleApproachDoor}>Approach the sealed door</button>
-                <button onClick={handleDoNothing}>Do absolutely nothing</button>
+                <CommonButtonContainer>
+                    <button onClick={handleApproachDoor}>Approach the sealed door</button>
+                    <button onClick={handleDoNothing}>Do absolutely nothing</button>
+                </CommonButtonContainer>
             </>}
         </>
     }
 
     const renderDoNothing = () => {
-        advanceDialogueUntil(5, 2200);
         return <>
             {dialogueStep > 1 && <>
                 <p>Well, it really <em>feels like</em> a great day outside the closed-off room. <br />
                     {dialogueStep > 2 && <>
                         It's really such a pity you won't be able to fully enjoy it.
                     </>}
-                    {dialogueStep > 3 && <Styles.Unless shouldAnimate={dialogueStep < 5}>Unless...</Styles.Unless>}
                 </p>
-                {dialogueStep > 4 && <>
-                    <button onClick={handleApproachDoor}>Approach the sealed door</button>
-                    <button onClick={handleLookAround}>Look around</button>
-                </>}
+                {dialogueStep > 3 && <p><Styles.Unless shouldAnimate={true}>Unless...</Styles.Unless></p>}
+                {dialogueStep > 4 &&
+                    <CommonButtonContainer>
+                        <button onClick={handleApproachDoor}>Approach the sealed door</button>
+                        <button onClick={handleLookAround}>Look around</button>
+                    </CommonButtonContainer>
+                }
             </>}
         </>
     }
 
     const renderCloseToDoor = () => {
-        advanceDialogueUntil(5, 1800);
         return <>
             <p>As you approach the door, you see a ring-shaped engraving, marked by many different runes around its edges.</p>
             {dialogueStep > 0 && <p>
@@ -138,9 +168,6 @@ export default function Chapter0() {
     }
 
     const renderEnd = () => {
-        advanceDialogueUntil(6, 2000, () => {
-            setHasReachedEnd(true);
-        });
         return <>
             <p>.{dialogueStep > 0 && "."}{dialogueStep > 1 && "."}</p>
             {dialogueStep > 2 && <p>*THUD*</p>}
@@ -162,26 +189,20 @@ export default function Chapter0() {
     }
 
     const renderMessage = () => {
-        advanceDialogueUntil(12, 2000, () => {
-            setIsPostLightScreen(true);
-            setTimeout(() => {
-                nextChapter();
-            }, 5000);
-        });
         return <p>
-            {dialogueStep > 7 && <>
+            {dialogueStep > 10 && <>
                 <Styles.AnimatedSpan>You. Are. Light.</Styles.AnimatedSpan><br />
             </>}
-            {dialogueStep > 8 && <>
+            {dialogueStep > 11 && <>
                 <Styles.AnimatedSpan>As I show this light to you.</Styles.AnimatedSpan>
             </>}
-            {dialogueStep > 9 && <>
+            {dialogueStep > 12 && <>
                 <Styles.AnimatedSpan>Shine light on this desolate land.</Styles.AnimatedSpan>
             </>}
-            {dialogueStep > 10 && <>
+            {dialogueStep > 13 && <>
                 <Styles.AnimatedSpan>Find Elizabeth.</Styles.AnimatedSpan>
             </>}
-            {dialogueStep > 11 && <>
+            {dialogueStep > 14 && <>
                 <Styles.AnimatedSpan>Your path has just begun.</Styles.AnimatedSpan>
             </>}
         </p>

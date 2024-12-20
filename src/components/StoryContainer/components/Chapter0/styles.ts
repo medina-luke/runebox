@@ -2,10 +2,10 @@ import styled, { css, keyframes } from "styled-components";
 
 const unlessAnim = keyframes`
     from {
-        zoom: 0;
+        font-size: 0;
     }
     to {
-        zoom: 1;
+        font-size: inherit;
     }
 `
 
@@ -26,7 +26,7 @@ export const Unless = styled.span<{ shouldAnimate: boolean; }>`
             `
         }
     }}
-
+    display: inline-block;
     color: var(--special-color);
 `
 
@@ -54,7 +54,7 @@ export const LightScreen = styled.div<{ shouldFade: boolean; }>`
     flex-flow: row nowrap;
     justify-content: center;
     align-items: center;
-
+    
     &::before {
         content: "";
         position: fixed;
@@ -73,4 +73,6 @@ export const LightScreen = styled.div<{ shouldFade: boolean; }>`
 
 export const AnimatedSpan = styled.span`
     animation: ${showAnim} .8s ease-in-out;
+    display: block;
+    color: var(--special-color);
 `

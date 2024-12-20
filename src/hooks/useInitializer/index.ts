@@ -42,13 +42,13 @@ export const useInitializer = () => {
 
     // Consistent passive income flow
     useEffect(() => {
-        startIncomeFlow();
+        // startIncomeFlow();
 
-        window.addEventListener("visibilitychange", handleVisibilityChange);
-        return () => {
-            stopIncomeFlow();
-            window.removeEventListener("visibilitychange", handleVisibilityChange);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // window.addEventListener("visibilitychange", handleVisibilityChange);
+        // return () => {
+        //     stopIncomeFlow();
+        //     window.removeEventListener("visibilitychange", handleVisibilityChange);
+        // }
+
     }, []);
 }
